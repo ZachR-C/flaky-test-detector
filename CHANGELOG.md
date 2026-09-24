@@ -45,5 +45,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo flaky test examples (randomness, timing) with educational comments
 - Comprehensive inline documentation throughout codebase
 
-[Unreleased]: https://github.com/yourusername/flaky-test-detector/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/yourusername/flaky-test-detector/releases/tag/v0.1.0
+[Unreleased]: https://github.com/ZachR-C/flaky-test-detector/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/ZachR-C/flaky-test-detector/releases/tag/v0.1.0

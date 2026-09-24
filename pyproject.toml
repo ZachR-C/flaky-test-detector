@@ -62,7 +62,7 @@ license = {text = "MIT"}
 
 # Project maintainers.
 authors = [
-    {name = "Your Name", email = "you@example.com"},
+    {name = "Zachary Cherney", email = "zacharyrcherney@gmail.com"},
 ]
 
 # Keywords help people discover the project on PyPI.
@@ -126,11 +126,11 @@ dev = [
 # URLs shown on the PyPI project page
 # =============================================================================
 [project.urls]
-Homepage      = "https://github.com/yourusername/flaky-test-detector"
-Documentation = "https://github.com/yourusername/flaky-test-detector#readme"
-Repository    = "https://github.com/yourusername/flaky-test-detector"
-"Bug Tracker" = "https://github.com/yourusername/flaky-test-detector/issues"
-Changelog     = "https://github.com/yourusername/flaky-test-detector/blob/main/CHANGELOG.md"
+Homepage      = "https://github.com/ZachR-C/flaky-test-detector"
+Documentation = "https://github.com/ZachR-C/flaky-test-detector#readme"
+Repository    = "https://github.com/ZachR-C/flaky-test-detector"
+"Bug Tracker" = "https://github.com/ZachR-C/flaky-test-detector/issues"
+Changelog     = "https://github.com/ZachR-C/flaky-test-detector/blob/main/CHANGELOG.md"
 
 # =============================================================================
 # CLI entry point

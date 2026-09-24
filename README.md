@@ -8,7 +8,7 @@
 
 Run your test suite N times, catch inconsistent results, and get a ranked report of which tests are lying to you.
 
-[![CI](https://github.com/yourusername/flaky-test-detector/actions/workflows/ci.yml/badge.svg)](https://github.com/yourusername/flaky-test-detector/actions/workflows/ci.yml)
+[![CI](https://github.com/ZachR-C/flaky-test-detector/actions/workflows/ci.yml/badge.svg)](https://github.com/ZachR-C/flaky-test-detector/actions/workflows/ci.yml)
 [![PyPI version](https://badge.fury.io/py/flakydetect.svg)](https://badge.fury.io/py/flakydetect)
 [![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -108,7 +108,7 @@ pipx install flakydetect
 **From source** (for development):
 
 ```bash
-git clone https://github.com/yourusername/flaky-test-detector.git
+git clone https://github.com/ZachR-C/flaky-test-detector.git
 cd flaky-test-detector
 pip install -e ".[dev]"   # -e = editable install, [dev] = includes dev tools
 ```
@@ -421,7 +421,7 @@ Contributions are very welcome! This project is a great place to make your first
 ### Setup
 
 ```bash
-git clone https://github.com/yourusername/flaky-test-detector.git
+git clone https://github.com/ZachR-C/flaky-test-detector.git
 cd flaky-test-detector
 python -m venv .venv
 source .venv/bin/activate   # On Windows: .venv\Scripts\activate
@@ -486,7 +486,7 @@ Free for personal and commercial use. Attribution appreciated but not required.
 
 <div align="center">
 
-Built with ❤️ by a computer science student who got tired of spurious CI failures.
+Built by [Zachary Cherney](https://github.com/ZachR-C) — a computer science student who got tired of spurious CI failures.
 
 **If this saved you time, please ⭐ star the repo — it helps others find it.**
 

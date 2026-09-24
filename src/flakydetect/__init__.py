@@ -32,6 +32,6 @@
 __version__ = "0.1.0"
 
 # The name of this package, exposed as a public attribute.
-__author__ = "Your Name"
-__email__ = "you@example.com"
+__author__ = "Zachary Cherney"
+__email__ = "zacharyrcherney@gmail.com"
 __license__ = "MIT"
