@@ -1,0 +1,81 @@
+version: "1"
+
+# =============================================================================
+# .github/workflows/flaky-check.yml
+# =============================================================================
+#
+# A REUSABLE GitHub Actions workflow snippet that users can copy into their
+# own repos to run flakydetect as part of their CI pipeline.
+#
+# HOW TO USE:
+#   Copy this file into your own project's .github/workflows/ directory.
+#   Then push to GitHub — it will run automatically on every push.
+#
+# WHAT IT DOES:
+#   1. Sets up Python
+#   2. Installs flakydetect
+#   3. Runs your test suite 10 times
+#   4. Uploads the JSON report as a build artifact (downloadable from GitHub)
+#   5. Fails the CI step if any flaky tests are found
+#
+# =============================================================================
+
+name: Flaky Test Detection
+
+on:
+  # Run on pushes to main (e.g., after merging a PR).
+  push:
+    branches: [ "main" ]
+
+  # Run weekly on Monday at 9am UTC to catch timing-related flakiness
+  # that might not show up on every push.
+  schedule:
+    - cron: "0 9 * * 1"   # Every Monday at 9:00 UTC
+
+  # Allow manual triggering from the GitHub UI.
+  workflow_dispatch:
+
+jobs:
+  flaky-detection:
+    name: Detect Flaky Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          # Install your project's dependencies first.
+          pip install -r requirements.txt  # or: pip install -e .
+          # Then install flakydetect.
+          pip install flakydetect
+
+      - name: Run flaky test detection
+        # `|| true` at the end prevents this step from failing the workflow
+        # on exit code 2 (flaky tests found). We handle the exit code below.
+        run: |
+          flaky-detect \
+            --cmd "pytest tests/ -v" \
+            --runs 10 \
+            --threshold 5.0 \
+            --output flaky-report.json
+        # `continue-on-error: true` means the workflow continues even if
+        # flaky tests are found. We upload the report regardless.
+        continue-on-error: true
+
+      - name: Upload flaky test report
+        uses: actions/upload-artifact@v4
+        with:
+          name: flaky-test-report
+          path: flaky-report.json
+          # Keep the report for 30 days so you can compare over time.
+          retention-days: 30
+        # Only upload if the file was created (may not exist if the command failed to start).
+        if: always()

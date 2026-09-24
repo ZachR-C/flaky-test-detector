@@ -1,0 +1,182 @@
+# =============================================================================
+# .github/workflows/ci.yml
+# =============================================================================
+#
+# PURPOSE OF THIS FILE:
+#   A GitHub Actions CI/CD workflow that automatically runs on every push
+#   and pull request to ensure code quality.
+#
+# CONCEPT: CI/CD (Continuous Integration / Continuous Delivery)
+#   CI means: every time someone pushes code, automated checks run
+#   immediately to catch bugs early. The idea is to "continuously integrate"
+#   small changes rather than batching large ones that are hard to debug.
+#
+#   A CI pipeline typically:
+#     1. Checks out your code
+#     2. Sets up the environment (install Python, dependencies)
+#     3. Runs linters (check code style/formatting)
+#     4. Runs type checkers
+#     5. Runs unit tests
+#     6. Reports coverage
+#
+# CONCEPT: GitHub Actions
+#   GitHub Actions is GitHub's built-in CI/CD system. You define "workflows"
+#   in YAML files inside `.github/workflows/`. GitHub runs these automatically
+#   whenever the trigger events occur (push, PR, schedule, etc.).
+#
+#   Key concepts:
+#     - Workflow: the whole file (one pipeline)
+#     - Job: a set of steps that run on one machine
+#     - Step: a single task (run a command, use an Action)
+#     - Action: a reusable piece of CI logic shared on the marketplace
+#       Example: `actions/checkout@v4` checks out your repository's code.
+#
+# CONCEPT: YAML
+#   YAML (YAML Ain't Markup Language) is a human-readable data format used
+#   for configuration files. Indentation matters — it defines nesting.
+#
+# =============================================================================
+
+# The name of this workflow (shown in the GitHub Actions UI).
+name: CI
+
+# ============================================================
+# When to run this workflow
+# ============================================================
+on:
+  # Run on every push to these branches.
+  push:
+    branches: [ "main", "develop" ]
+
+  # Run on every pull request targeting these branches.
+  # This means even before code is merged, it gets checked.
+  pull_request:
+    branches: [ "main" ]
+
+  # Also allow manually triggering the workflow from the GitHub UI.
+  workflow_dispatch:
+
+# ============================================================
+# Jobs
+# ============================================================
+jobs:
+
+  # ----------------------------------------------------------
+  # Job 1: Linting
+  # Check code style, formatting, and basic errors before
+  # running tests (it's faster to fail on style issues first).
+  # ----------------------------------------------------------
+  lint:
+    name: Lint & Format Check
+    # Run on the latest Ubuntu (Linux) virtual machine provided by GitHub.
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out our repository code onto the runner machine.
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: Install Python. We use 3.11 for the lint job.
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          # Cache pip downloads so repeated runs are faster.
+          cache: "pip"
+
+      # Step 3: Install only the dev dependencies (linting tools).
+      - name: Install dev dependencies
+        run: pip install -e ".[dev]"
+
+      # Step 4: Run ruff linter.
+      # `ruff check .` checks all Python files in the current directory.
+      - name: Run ruff linter
+        run: ruff check src/ tests/
+
+      # Step 5: Check that black would not make any changes.
+      # `--check` mode exits with error if any file would be reformatted.
+      # This enforces consistent formatting without actually changing files.
+      - name: Check formatting with black
+        run: black --check src/ tests/
+
+  # ----------------------------------------------------------
+  # Job 2: Tests
+  # Run unit tests against multiple Python versions.
+  # Testing on multiple versions ensures compatibility.
+  # ----------------------------------------------------------
+  test:
+    name: Tests (Python ${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+
+    # CONCEPT: Matrix Strategy
+    # A matrix lets you run the same job with different parameters.
+    # Here, we run the test job 3 times — once for each Python version.
+    # If tests fail on Python 3.9 but pass on 3.11, you'll know immediately.
+    strategy:
+      # `fail-fast: false` means: don't cancel other matrix runs if one fails.
+      # We want to see results from ALL versions even if one breaks.
+      fail-fast: false
+      matrix:
+        python-version: ["3.9", "3.11", "3.12"]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # ${{ matrix.python-version }} is a variable — it gets replaced with
+      # the current matrix value (e.g., "3.9", "3.11", "3.12").
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
+
+      - name: Install package and dependencies
+        run: pip install -e ".[dev]"
+
+      # Run pytest with coverage measurement.
+      # `--cov=src/flakydetect` measures which lines in our package are hit.
+      # `--cov-report=xml` produces a coverage.xml file for the next step.
+      # `--cov-report=term-missing` also prints uncovered lines to the terminal.
+      - name: Run tests with coverage
+        run: |
+          pytest tests/ \
+            --cov=src/flakydetect \
+            --cov-report=xml \
+            --cov-report=term-missing
+
+      # Upload coverage data to Codecov (free service for open source).
+      # This enables the coverage badge on your README.
+      # Sign up at codecov.io and add your repo to get the badge URL.
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: coverage.xml
+          # Don't fail the CI if Codecov upload fails (it's not critical).
+          fail_ci_if_error: false
+        # `continue-on-error` means this step doesn't block the job if it fails.
+        continue-on-error: true
+
+  # ----------------------------------------------------------
+  # Job 3: Type checking
+  # Run mypy to verify type annotations are consistent.
+  # ----------------------------------------------------------
+  typecheck:
+    name: Type Check (mypy)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Run mypy
+        # `--ignore-missing-imports` prevents errors from third-party packages
+        # that don't include type stubs (mypy type information).
+        run: mypy src/flakydetect --ignore-missing-imports

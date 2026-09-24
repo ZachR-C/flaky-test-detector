@@ -1,0 +1,259 @@
+# =============================================================================
+# pyproject.toml
+# =============================================================================
+#
+# PURPOSE OF THIS FILE:
+#   This is the modern Python project configuration file. It replaced the
+#   older `setup.py` and `setup.cfg` files (you may still see those in
+#   older projects, but pyproject.toml is the current standard as of PEP 517/518).
+#
+# WHAT IT DOES:
+#   1. Declares metadata about the package (name, version, author, description)
+#   2. Specifies dependencies (what other packages are required)
+#   3. Configures the build system (how to package it for distribution)
+#   4. Configures tools like pytest, black (formatter), and ruff (linter)
+#
+# CONCEPT: Package Dependencies
+#   When you write `dependencies = ["typer>=0.9", "rich>=13.0"]`, you're saying:
+#   "My package requires typer version 0.9 or newer and rich version 13 or newer."
+#   `pip install flakydetect` will automatically install these.
+#
+#   Version specifiers:
+#     `>=0.9`  means "0.9 or any newer version"
+#     `~=0.9`  means "0.9 or newer, but NOT 1.0 or higher" (conservative)
+#     `==0.9`  means "EXACTLY 0.9" (very restrictive, rarely used in libraries)
+#
+# CONCEPT: Entry Points
+#   The `[project.scripts]` section tells pip: "Create a command called
+#   `flaky-detect` that calls the `app` function in `flakydetect.cli`."
+#   This is what makes `flaky-detect` work as a command in the terminal
+#   after `pip install flakydetect`.
+#
+# =============================================================================
+
+[build-system]
+# `hatchling` is a modern, fast Python build backend.
+# Alternatives: setuptools (older, ubiquitous), flit (simple), poetry (opinionated).
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+# The name on PyPI — this is what people type in `pip install <name>`.
+name = "flakydetect"
+
+# The current version. Always update this when you publish a new release.
+# Follow Semantic Versioning: MAJOR.MINOR.PATCH
+version = "0.1.0"
+
+# One-line description shown on PyPI and in `pip show flakydetect`.
+description = "A CLI tool to detect flaky tests by running your test suite multiple times."
+
+# Long description shown on the PyPI project page.
+# `file: README.md` means "read the description from the README.md file."
+readme = "README.md"
+
+# Minimum Python version required. f-strings, dataclasses, and pathlib are
+# available since 3.7, but we require 3.8 for walrus operator and newer typing.
+requires-python = ">=3.8"
+
+# The open-source license type.
+# MIT is permissive: anyone can use, modify, or distribute the code freely.
+license = {text = "MIT"}
+
+# Project maintainers.
+authors = [
+    {name = "Your Name", email = "you@example.com"},
+]
+
+# Keywords help people discover the project on PyPI.
+keywords = ["testing", "flaky-tests", "pytest", "qa", "test-automation", "cli"]
+
+# PyPI classifiers help users filter by category, language, and status.
+# Full list at: https://pypi.org/classifiers/
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Software Development :: Quality Assurance",
+]
+
+# =============================================================================
+# Runtime dependencies
+# These are REQUIRED to use flakydetect. pip will install them automatically.
+# =============================================================================
+dependencies = [
+    # typer: builds the CLI argument parser from function type annotations.
+    "typer>=0.9.0",
+    # rich: beautiful terminal output with colors, tables, and panels.
+    "rich>=13.0.0",
+    # typing-extensions: backports newer typing features to Python 3.8+.
+    "typing-extensions>=4.0.0",
+]
+
+# =============================================================================
+# Optional / development dependencies
+# These are NOT installed by default — only when you run:
+#   pip install flakydetect[dev]
+# or
+#   pip install -e ".[dev]"   (editable install with dev extras)
+# =============================================================================
+[project.optional-dependencies]
+dev = [
+    # pytest: test runner and framework
+    "pytest>=7.0",
+    # pytest-cov: coverage reporting (how much of your code tests actually hit)
+    "pytest-cov>=4.0",
+    # ruff: extremely fast Python linter (replaces flake8, isort, etc.)
+    "ruff>=0.1.0",
+    # black: opinionated code formatter (auto-formats your code consistently)
+    "black>=23.0",
+    # mypy: static type checker (verifies type annotations are consistent)
+    "mypy>=1.0",
+    # pre-commit: runs checks automatically before each git commit
+    "pre-commit>=3.0",
+]
+
+# =============================================================================
+# URLs shown on the PyPI project page
+# =============================================================================
+[project.urls]
+Homepage      = "https://github.com/yourusername/flaky-test-detector"
+Documentation = "https://github.com/yourusername/flaky-test-detector#readme"
+Repository    = "https://github.com/yourusername/flaky-test-detector"
+"Bug Tracker" = "https://github.com/yourusername/flaky-test-detector/issues"
+Changelog     = "https://github.com/yourusername/flaky-test-detector/blob/main/CHANGELOG.md"
+
+# =============================================================================
+# CLI entry point
+# =============================================================================
+# After `pip install flakydetect`, a `flaky-detect` command is available.
+# This maps the command name → the Python function to call.
+# Format: "command-name" = "package.module:function_or_object"
+[project.scripts]
+flaky-detect = "flakydetect.cli:app"
+
+# =============================================================================
+# Hatchling (build tool) configuration
+# =============================================================================
+[tool.hatch.build.targets.wheel]
+# Tell hatchling where the source code lives (the `src/` layout).
+# This means `src/flakydetect/` will be installed as the `flakydetect` package.
+packages = ["src/flakydetect"]
+
+# =============================================================================
+# pytest configuration
+# =============================================================================
+[tool.pytest.ini_options]
+# `testpaths`: where pytest looks for test files.
+testpaths = ["tests"]
+
+# `addopts`: extra options automatically added to every `pytest` invocation.
+#   -v:      verbose (show each test name individually)
+#   --tb=short: short tracebacks (not full 30-line tracebacks by default)
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",   # Error if you use undefined markers (prevents typos)
+]
+
+# Custom marks (used with @pytest.mark.xyz decorators).
+# Declaring them here prevents "PytestUnknownMarkWarning".
+markers = [
+    "slow: marks tests as slow (use -m 'not slow' to skip them)",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+
+# =============================================================================
+# Coverage configuration (pytest-cov)
+# =============================================================================
+[tool.coverage.run]
+# Measure coverage for the flakydetect package source code.
+source = ["src/flakydetect"]
+
+# Omit files that shouldn't count toward coverage (generated/config files).
+omit = [
+    "*/tests/*",
+    "*/examples/*",
+    "*/__pycache__/*",
+]
+
+[tool.coverage.report]
+# Lines matching these patterns are excluded from coverage stats.
+# We don't count the `if __name__ == "__main__":` guard as an uncovered branch.
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "raise NotImplementedError",
+    "@abc.abstractmethod",
+]
+
+# Minimum coverage threshold. `pytest --cov --cov-fail-under=80` will fail
+# the CI if less than 80% of lines are covered by tests.
+fail_under = 70
+
+# =============================================================================
+# ruff (linter) configuration
+# =============================================================================
+[tool.ruff]
+# The Python version to target for linting rules.
+target-version = "py38"
+
+# Maximum line length (88 matches Black's default).
+line-length = 88
+
+[tool.ruff.lint]
+# Enable specific rule categories:
+#   E: pycodestyle error rules
+#   F: pyflakes rules (undefined names, unused imports, etc.)
+#   I: isort rules (import sorting)
+#   N: pep8-naming rules
+#   W: pycodestyle warning rules
+select = ["E", "F", "I", "N", "W"]
+
+# Rules to ignore (with justification):
+ignore = [
+    "E501",  # Line too long — we handle this with Black formatter
+]
+
+# Files/directories to never lint.
+exclude = [
+    ".venv",
+    "__pycache__",
+    "*.egg-info",
+    "examples/",     # Examples are intentionally demonstrating bad practices
+]
+
+# =============================================================================
+# black (formatter) configuration
+# =============================================================================
+[tool.black]
+line-length = 88
+target-version = ["py38", "py39", "py310", "py311"]
+
+# Files to skip formatting (for the same reason we skip linting examples/).
+extend-exclude = "examples/"
+
+# =============================================================================
+# mypy (type checker) configuration
+# =============================================================================
+[tool.mypy]
+python_version = "3.8"
+
+# Be strict about type checking:
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+
+# Where to find our package source.
+mypy_path = ["src"]

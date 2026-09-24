@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  =============================================================================
+  tests/fixtures/sample_junit_output.xml
+  =============================================================================
+
+  PURPOSE OF THIS FILE:
+    A sample JUnit XML file used as a test fixture.
+    This represents what pytest produces when run with --junitxml=output.xml.
+
+  HOW TO USE:
+    In tests, you can load this file with:
+        fixture_path = Path(__file__).parent / "fixtures" / "sample_junit_output.xml"
+        parser = JUnitXMLParser(xml_path=str(fixture_path))
+        results = parser.parse()
+
+  CONCEPT: Test Fixtures
+    A "fixture" (in the general software sense, distinct from pytest's specific
+    @pytest.fixture) is a known, fixed piece of data used to test against.
+    Using a real-looking fixture (rather than a tiny stub) gives you more
+    confidence that the parser works on real-world input.
+
+  ABOUT JUNIT XML FORMAT:
+    - <testsuites>: top-level container (optional in some implementations)
+    - <testsuite>: one test file/class, with summary attributes
+    - <testcase>: one individual test
+      - No children → PASSED
+      - <failure> child → FAILED (assertion error)
+      - <error> child → ERROR (unexpected exception)
+      - <skipped> child → SKIPPED
+
+  =============================================================================
+-->
+<testsuites>
+
+  <!-- Test suite 1: Authentication tests -->
+  <testsuite
+    name="tests/test_auth.py"
+    tests="5"
+    failures="1"
+    errors="0"
+    skipped="1"
+    time="0.842">
+
+    <!-- This test has no children → it PASSED -->
+    <testcase
+      classname="tests.test_auth"
+      name="test_login_success"
+      time="0.150"/>
+
+    <!-- This test has no children → it PASSED -->
+    <testcase
+      classname="tests.test_auth"
+      name="test_logout"
+      time="0.080"/>
+
+    <!-- This test has a <failure> child → it FAILED -->
+    <testcase
+      classname="tests.test_auth"
+      name="test_login_timeout"
+      time="0.312">
+      <failure message="AssertionError: Expected status 200, got 408">
+        Traceback (most recent call last):
+          File "tests/test_auth.py", line 47, in test_login_timeout
+            assert response.status_code == 200
+        AssertionError: Expected status 200, got 408
+      </failure>
+    </testcase>
+
+    <!-- This test has a <skipped> child → it was SKIPPED -->
+    <testcase
+      classname="tests.test_auth"
+      name="test_oauth_flow"
+      time="0.000">
+      <skipped message="OAuth integration not configured in test environment"/>
+    </testcase>
+
+    <!-- Another passing test -->
+    <testcase
+      classname="tests.test_auth"
+      name="test_password_hashing"
+      time="0.300"/>
+
+  </testsuite>
+
+  <!-- Test suite 2: Database tests -->
+  <testsuite
+    name="tests/test_database.py"
+    tests="3"
+    failures="0"
+    errors="1"
+    skipped="0"
+    time="1.204">
+
+    <testcase
+      classname="tests.test_database"
+      name="test_create_user"
+      time="0.400"/>
+
+    <testcase
+      classname="tests.test_database"
+      name="test_query_users"
+      time="0.350"/>
+
+    <!-- This test has an <error> child → it raised an unexpected exception -->
+    <testcase
+      classname="tests.test_database"
+      name="test_transaction_rollback"
+      time="0.454">
+      <error message="ConnectionError: Could not connect to database">
+        Traceback (most recent call last):
+          File "tests/test_database.py", line 89, in test_transaction_rollback
+            conn = get_db_connection()
+          File "myapp/db.py", line 23, in get_db_connection
+            raise ConnectionError("Could not connect to database")
+        ConnectionError: Could not connect to database
+      </error>
+    </testcase>
+
+  </testsuite>
+
+</testsuites>
