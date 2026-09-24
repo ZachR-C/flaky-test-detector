@@ -33,19 +33,19 @@
 # =============================================================================
 
 # Standard library imports — these come built into Python, no installation needed.
-import logging          # For diagnostic messages (not print statements)
-import subprocess       # For launching the test command as a child process
-import time             # For measuring how long each run takes
-import tempfile         # For creating temporary files to store JUnit XML output
-import os               # For file system operations (paths, checking if file exists)
+import logging  # For diagnostic messages (not print statements)
+import os  # For file system operations (paths, checking if file exists)
+import subprocess  # For launching the test command as a child process
+import tempfile  # For creating temporary files to store JUnit XML output
+import time  # For measuring how long each run takes
 from datetime import datetime  # For recording the timestamp of each run
-from pathlib import Path       # Modern, readable way to work with file paths
-from typing import Optional    # Optional[X] means the value is either X or None
+from pathlib import Path  # Modern, readable way to work with file paths
+from typing import Optional  # Optional[X] means the value is either X or None
 
 # Local imports — these come from other files in our own package.
 # The `.` prefix means "from the same package."
 from .models import RunResult  # We return RunResult objects from this module
-from .parsers import get_parser # Factory function to select the right parser
+from .parsers import get_parser  # Factory function to select the right parser
 
 # CONCEPT: Logging Setup
 #   `__name__` is a special Python variable that contains the current module's
@@ -106,8 +106,8 @@ class TestRunner:
         self,
         command: str,
         num_runs: int,
-        working_dir: Optional[str] = None,   # type: ignore[name-defined]
-        timeout: Optional[int] = 300,          # type: ignore[name-defined]
+        working_dir: Optional[str] = None,  # type: ignore[name-defined]
+        timeout: Optional[int] = 300,  # type: ignore[name-defined]
         parser_name: str = "auto",
     ) -> None:
         # `self` refers to the object being created.
@@ -156,9 +156,7 @@ class TestRunner:
         self._results = []
 
         # Log that we're starting — this shows up when the user runs with --verbose.
-        logger.info(
-            "Starting %d run(s) of command: %s", self.num_runs, self.command
-        )
+        logger.info("Starting %d run(s) of command: %s", self.num_runs, self.command)
 
         # CONCEPT: for loop
         #   `for i in range(1, self.num_runs + 1):` counts from 1 to num_runs
@@ -167,9 +165,7 @@ class TestRunner:
         #   `range(start, stop)` generates numbers from `start` up to but
         #   NOT including `stop`. So `range(1, 4)` gives 1, 2, 3.
         for run_index in range(1, self.num_runs + 1):
-            logger.info(
-                "Run %d/%d ...", run_index, self.num_runs
-            )
+            logger.info("Run %d/%d ...", run_index, self.num_runs)
 
             # CONCEPT: try / except
             #   Code inside `try:` is attempted. If ANY line raises an
@@ -197,7 +193,9 @@ class TestRunner:
                 # permission denied, etc.). Log the error and keep going.
                 logger.error(
                     "Run %d/%d raised an unexpected error: %s",
-                    run_index, self.num_runs, e,
+                    run_index,
+                    self.num_runs,
+                    e,
                     exc_info=True,  # Also log the full traceback
                 )
                 # `continue` skips to the next loop iteration.
@@ -311,12 +309,12 @@ class TestRunner:
             duration = time.monotonic() - run_start
             logger.error(
                 "Run %d timed out after %.1fs (limit: %ds)",
-                run_index, duration, self.timeout,
+                run_index,
+                duration,
+                self.timeout,
             )
             # Re-raise with more context
-            raise RuntimeError(
-                f"Run {run_index} timed out after {self.timeout}s"
-            )
+            raise RuntimeError(f"Run {run_index} timed out after {self.timeout}s")
 
         except FileNotFoundError:
             # The command executable wasn't found on the system PATH.
@@ -330,7 +328,9 @@ class TestRunner:
 
         logger.debug(
             "Run %d exited with code %d in %.2fs",
-            run_index, proc.returncode, duration,
+            run_index,
+            proc.returncode,
+            duration,
         )
         logger.debug("stdout:\n%s", proc.stdout[:500] if proc.stdout else "(empty)")
 
@@ -390,6 +390,3 @@ class TestRunner:
 
         # For non-pytest commands, run as-is and rely on stdout parsing.
         return self.command
-
-
-

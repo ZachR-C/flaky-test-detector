@@ -37,23 +37,24 @@
 #
 # =============================================================================
 
-import pytest
 from datetime import datetime
+
+import pytest
 
 # Import the things we're testing.
 # Because we use `src/` layout, make sure you've installed the package
 # with `pip install -e .` or run pytest from the project root.
 from flakydetect.models import (
-    TestResult,
-    RunResult,
-    FlakeStats,
     FlakeReport,
+    FlakeStats,
+    RunResult,
+    TestResult,
 )
-
 
 # =============================================================================
 # TestResult tests
 # =============================================================================
+
 
 class TestTestResult:
     """
@@ -72,9 +73,9 @@ class TestTestResult:
         # Verify the fields we set are stored correctly.
         assert result.name == "test_login"
         assert result.passed is True
-        assert result.skipped is False    # Default value
-        assert result.duration is None    # Default value
-        assert result.message is None     # Default value
+        assert result.skipped is False  # Default value
+        assert result.duration is None  # Default value
+        assert result.message is None  # Default value
 
     def test_failed_test_creation(self):
         """A failing test result stores all relevant information."""
@@ -132,6 +133,7 @@ class TestTestResult:
 # =============================================================================
 # RunResult tests
 # =============================================================================
+
 
 class TestRunResult:
     """Tests for the RunResult dataclass and its computed properties."""
@@ -200,6 +202,7 @@ class TestRunResult:
 # FlakeStats tests
 # =============================================================================
 
+
 class TestFlakeStats:
     """Tests for the FlakeStats dataclass and its computed properties."""
 
@@ -265,7 +268,7 @@ class TestFlakeStats:
             pass_count=2,
             fail_count=1,
             skip_count=0,
-            flake_rate=1/3,  # 0.333...
+            flake_rate=1 / 3,  # 0.333...
         )
         # 0.333... × 100 = 33.3...  →  rounded to 33.3
         assert stats.flake_percentage == 33.3
@@ -274,6 +277,7 @@ class TestFlakeStats:
 # =============================================================================
 # FlakeReport tests
 # =============================================================================
+
 
 class TestFlakeReport:
     """Tests for the FlakeReport dataclass and its derived properties."""

@@ -83,8 +83,8 @@ class BaseParser(abc.ABC):
     ) -> None:
         # Store the inputs as instance attributes so subclasses can access them.
         self.xml_path = xml_path
-        self.stdout = stdout or ""   # Default to empty string if None
-        self.stderr = stderr or ""   # Default to empty string if None
+        self.stdout = stdout or ""  # Default to empty string if None
+        self.stderr = stderr or ""  # Default to empty string if None
 
     # -------------------------------------------------------------------------
     # @abstractmethod
@@ -150,7 +150,9 @@ class BaseParser(abc.ABC):
         except (ValueError, TypeError):
             # ValueError: string couldn't be converted (e.g., "N/A")
             # TypeError:  value was the wrong type entirely
-            logger.debug("Could not convert %r to float; using default %s", value, default)
+            logger.debug(
+                "Could not convert %r to float; using default %s", value, default
+            )
             return default
 
     def _normalize_test_name(self, name: str) -> str:

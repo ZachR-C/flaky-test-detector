@@ -29,10 +29,9 @@ from pathlib import Path
 
 import pytest
 
+from flakydetect.parsers import get_parser
 from flakydetect.parsers.junit_xml import JUnitXMLParser
 from flakydetect.parsers.pytest_text import PytestTextParser
-from flakydetect.parsers import get_parser
-
 
 # =============================================================================
 # Shared XML content
@@ -106,6 +105,7 @@ SAMPLE_PYTEST_STDOUT = textwrap.dedent("""\
 # =============================================================================
 # JUnit XML Parser Tests
 # =============================================================================
+
 
 class TestJUnitXMLParser:
     """Tests for the JUnitXMLParser."""
@@ -208,14 +208,15 @@ class TestJUnitXMLParser:
         for result in results:
             # `.strip()` removes whitespace; if the name is already clean,
             # this should be a no-op and the assertion should pass.
-            assert result.name == result.name.strip(), (
-                f"Test name has extra whitespace: {result.name!r}"
-            )
+            assert (
+                result.name == result.name.strip()
+            ), f"Test name has extra whitespace: {result.name!r}"
 
 
 # =============================================================================
 # Pytest Text Parser Tests
 # =============================================================================
+
 
 class TestPytestTextParser:
     """Tests for the PytestTextParser (fallback parser)."""
@@ -266,6 +267,7 @@ class TestPytestTextParser:
 # =============================================================================
 # get_parser() factory tests
 # =============================================================================
+
 
 class TestGetParser:
     """Tests for the parser factory function."""

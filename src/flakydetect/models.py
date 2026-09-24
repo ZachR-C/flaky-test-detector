@@ -54,15 +54,15 @@
 # `field` lets us set per-field options like default factories.
 from dataclasses import dataclass, field
 
+# `datetime` represents a specific point in time (date + time combined).
+# We use it to record WHEN a test run happened so we can track trends over time.
+from datetime import datetime
+
 # `Optional` means a value can be either a specific type OR None (absent).
 # `List` means a list of a specific type, e.g. List[str] = list of strings.
 # `Dict` means a dictionary mapping one type to another.
 # These come from the `typing` module — Python's type annotation tools.
-from typing import Optional, List, Dict
-
-# `datetime` represents a specific point in time (date + time combined).
-# We use it to record WHEN a test run happened so we can track trends over time.
-from datetime import datetime
+from typing import Dict, List, Optional
 
 
 # -----------------------------------------------------------------------------

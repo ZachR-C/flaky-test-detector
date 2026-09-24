@@ -25,17 +25,18 @@
 #
 # =============================================================================
 
-import pytest
 from datetime import datetime
 from typing import List
 
-from flakydetect.models import TestResult, RunResult, FlakeStats
-from flakydetect.aggregator import Aggregator
+import pytest
 
+from flakydetect.aggregator import Aggregator
+from flakydetect.models import RunResult, TestResult
 
 # =============================================================================
 # Shared helpers
 # =============================================================================
+
 
 def make_test_result(name: str, passed: bool, skipped: bool = False) -> TestResult:
     """Create a simple TestResult for testing."""
@@ -105,7 +106,9 @@ class TestAggregator:
         for i in range(1, 11):
             # For runs 1–7, the test passes. For runs 8–10, it fails.
             passed = i <= 7
-            runs.append(make_run_result(i, [make_test_result("test_login", passed=passed)]))
+            runs.append(
+                make_run_result(i, [make_test_result("test_login", passed=passed)])
+            )
 
         aggregator = Aggregator(run_results=runs, command="pytest tests/")
         report = aggregator.aggregate()
@@ -129,7 +132,9 @@ class TestAggregator:
         runs = []
         for i in range(1, 11):
             passed = i <= 8
-            runs.append(make_run_result(i, [make_test_result("test_flaky", passed=passed)]))
+            runs.append(
+                make_run_result(i, [make_test_result("test_flaky", passed=passed)])
+            )
 
         aggregator = Aggregator(run_results=runs, command="pytest tests/")
         report = aggregator.aggregate()
@@ -144,11 +149,11 @@ class TestAggregator:
             # (passes, fails, expected flake rate)
             # CONCEPT: parametrize table — each row is one test case.
             # Format: (input_1, input_2, expected_output)
-            (10, 0,  0.0),   # All passing → not flaky
-            (0,  10, 0.0),   # All failing → not flaky (broken)
-            (5,  5,  0.5),   # 50/50 → very flaky
-            (8,  2,  0.2),   # 80/20 → mildly flaky
-            (1,  9,  0.1),   # 10% pass → flake_rate = min(1,9)/10 = 0.1
+            (10, 0, 0.0),  # All passing → not flaky
+            (0, 10, 0.0),  # All failing → not flaky (broken)
+            (5, 5, 0.5),  # 50/50 → very flaky
+            (8, 2, 0.2),  # 80/20 → mildly flaky
+            (1, 9, 0.1),  # 10% pass → flake_rate = min(1,9)/10 = 0.1
         ],
     )
     def test_flake_rate_parametrized(self, pass_count, fail_count, expected_rate):
@@ -160,7 +165,7 @@ class TestAggregator:
           table above. pytest reports each run separately, so you get clear
           feedback on which specific case failed if something breaks.
         """
-        total = pass_count + fail_count
+        # total runs = pass_count + fail_count (used implicitly via the runs list)
         runs = []
         run_idx = 1
 
@@ -208,6 +213,7 @@ class TestAggregator:
     def test_report_stores_tool_version(self):
         """The report includes the tool version string."""
         from flakydetect import __version__
+
         runs = [make_run_result(1, [make_test_result("t", passed=True)])]
         aggregator = Aggregator(run_results=runs, command="pytest tests/")
         report = aggregator.aggregate()

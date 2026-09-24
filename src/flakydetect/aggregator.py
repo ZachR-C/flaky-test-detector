@@ -30,12 +30,12 @@
 # =============================================================================
 
 import logging
-from collections import defaultdict   # Specialized dict with auto-defaults
+from collections import defaultdict  # Specialized dict with auto-defaults
 from datetime import datetime
-from typing import List, Dict
+from typing import Dict, List
 
-from .models import RunResult, FlakeStats, FlakeReport, TestResult
-from . import __version__             # Import our tool's version number
+from . import __version__  # Import our tool's version number
+from .models import FlakeReport, FlakeStats, RunResult, TestResult
 
 logger = logging.getLogger(__name__)
 
@@ -84,9 +84,7 @@ class Aggregator:
             logger.warning("No run results to aggregate — returning empty report.")
             return self._build_empty_report()
 
-        logger.info(
-            "Aggregating results from %d run(s)...", self.total_runs
-        )
+        logger.info("Aggregating results from %d run(s)...", self.total_runs)
 
         # -----------------------------------------------------------------------
         # Step 1: Group test outcomes by test name across all runs.
@@ -154,9 +152,7 @@ class Aggregator:
 
         return report
 
-    def _compute_stats(
-        self, test_name: str, outcomes: List[TestResult]
-    ) -> FlakeStats:
+    def _compute_stats(self, test_name: str, outcomes: List[TestResult]) -> FlakeStats:
         """
         Compute FlakeStats for a single test given its outcomes across all runs.
 
@@ -214,11 +210,7 @@ class Aggregator:
         #   {expr for item in iterable if condition}
         # Similar to a list comprehension but produces a set (unique values only).
         unique_messages = list(
-            {
-                r.message
-                for r in outcomes
-                if r.message is not None and not r.passed
-            }
+            {r.message for r in outcomes if r.message is not None and not r.passed}
         )
 
         return FlakeStats(

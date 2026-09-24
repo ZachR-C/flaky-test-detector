@@ -156,9 +156,7 @@ class PytestTextParser(BaseParser):
             name = self._normalize_test_name(match.group(1))
             if name not in seen_names:
                 seen_names.add(name)
-                results.append(
-                    TestResult(name=name, passed=True, skipped=False)
-                )
+                results.append(TestResult(name=name, passed=True, skipped=False))
 
         # Find all FAILED test lines.
         for match in _FAILED_PATTERN.finditer(self.stdout):
@@ -181,9 +179,7 @@ class PytestTextParser(BaseParser):
             name = self._normalize_test_name(match.group(1))
             if name not in seen_names:
                 seen_names.add(name)
-                results.append(
-                    TestResult(name=name, passed=False, skipped=True)
-                )
+                results.append(TestResult(name=name, passed=False, skipped=True))
 
         if not results:
             logger.warning(

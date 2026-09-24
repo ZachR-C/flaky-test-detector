@@ -40,11 +40,9 @@
 #
 # =============================================================================
 
-import json           # Standard library: JSON serialization/deserialization
+import json  # Standard library: JSON serialization/deserialization
 import logging
-from datetime import datetime
 from pathlib import Path
-from typing import Optional
 
 # `rich` is a third-party library for beautiful terminal output.
 # We use a try/except to gracefully handle the case where it's not installed.
@@ -52,12 +50,13 @@ from typing import Optional
 #   Good programs don't crash hard when an optional feature is missing.
 #   If `rich` isn't installed, we fall back to plain print() statements.
 try:
-    from rich.console import Console
-    from rich.table import Table
-    from rich.panel import Panel
-    from rich.text import Text
     from rich import box
-    HAS_RICH = True   # Flag: rich is available
+    from rich.console import Console
+    from rich.panel import Panel
+    from rich.table import Table
+    from rich.text import Text  # noqa: F401  # kept for potential future use
+
+    HAS_RICH = True  # Flag: rich is available
 except ImportError:
     HAS_RICH = False  # Flag: rich is not installed; use plain text
 
@@ -71,11 +70,11 @@ logger = logging.getLogger(__name__)
 # Define our color scheme in one place so it's easy to change.
 # In `rich`, styles are strings describing color and formatting.
 # These are defined as module-level constants (all-caps by convention).
-STYLE_FLAKY   = "bold yellow"    # Yellow = warning, something needs attention
-STYLE_BROKEN  = "bold red"       # Red = error, test always fails
-STYLE_STABLE  = "bold green"     # Green = good, test is healthy
-STYLE_HEADING = "bold white"     # White = neutral, for labels
-STYLE_DIM     = "dim"            # Dim/grey = secondary information
+STYLE_FLAKY = "bold yellow"  # Yellow = warning, something needs attention
+STYLE_BROKEN = "bold red"  # Red = error, test always fails
+STYLE_STABLE = "bold green"  # Green = good, test is healthy
+STYLE_HEADING = "bold white"  # White = neutral, for labels
+STYLE_DIM = "dim"  # Dim/grey = secondary information
 
 
 def print_report(report: FlakeReport, verbose: bool = False) -> None:
@@ -144,6 +143,7 @@ def save_json(report: FlakeReport, output_path: str) -> None:
 # Private helper: rich terminal output
 # =============================================================================
 
+
 def _print_rich(report: FlakeReport, verbose: bool) -> None:
     """Render a beautiful rich-formatted report to the terminal."""
     # `Console()` is the main rich object for printing to the terminal.
@@ -162,12 +162,8 @@ def _print_rich(report: FlakeReport, verbose: bool) -> None:
     )
 
     # Summary line
-    console.print(
-        f"\n[{STYLE_HEADING}]Command:[/]  [white]{report.command}[/]"
-    )
-    console.print(
-        f"[{STYLE_HEADING}]Runs:[/]      [white]{report.total_runs}[/]"
-    )
+    console.print(f"\n[{STYLE_HEADING}]Command:[/]  [white]{report.command}[/]")
+    console.print(f"[{STYLE_HEADING}]Runs:[/]      [white]{report.total_runs}[/]")
     console.print(
         f"[{STYLE_HEADING}]Generated:[/] [white]{report.generated_at.strftime('%Y-%m-%d %H:%M:%S')}[/]\n"
     )
@@ -186,10 +182,10 @@ def _print_rich(report: FlakeReport, verbose: bool) -> None:
             show_lines=True,
         )
         # Add table columns
-        table.add_column("Test Name",   style="white",        no_wrap=False)
-        table.add_column("Flake Rate",  style="bold yellow",  justify="right")
-        table.add_column("Pass / Fail", style="white",        justify="center")
-        table.add_column("Runs",        style="dim",          justify="right")
+        table.add_column("Test Name", style="white", no_wrap=False)
+        table.add_column("Flake Rate", style="bold yellow", justify="right")
+        table.add_column("Pass / Fail", style="white", justify="center")
+        table.add_column("Runs", style="dim", justify="right")
 
         for stat in flaky:
             # Format the pass/fail ratio as "8 / 2"
@@ -203,17 +199,13 @@ def _print_rich(report: FlakeReport, verbose: bool) -> None:
             # In verbose mode, show the failure messages indented under the row.
             if verbose and stat.messages:
                 for msg in stat.messages[:3]:  # Show at most 3 messages
-                    table.add_row(
-                        f"  [dim italic]↳ {msg[:120]}[/]", "", "", ""
-                    )
+                    table.add_row(f"  [dim italic]↳ {msg[:120]}[/]", "", "", "")
 
         console.print(table)
         console.print()
 
     else:
-        console.print(
-            f"[{STYLE_STABLE}]✅  No flaky tests detected.[/]\n"
-        )
+        console.print(f"[{STYLE_STABLE}]✅  No flaky tests detected.[/]\n")
 
     # -----------------------------------------------------------------------
     # Always-failing tests table
@@ -228,8 +220,8 @@ def _print_rich(report: FlakeReport, verbose: bool) -> None:
             title_style="bold red",
         )
         table.add_column("Test Name", style="white")
-        table.add_column("Failed",    style="bold red", justify="right")
-        table.add_column("Runs",      style="dim",      justify="right")
+        table.add_column("Failed", style="bold red", justify="right")
+        table.add_column("Runs", style="dim", justify="right")
 
         for stat in broken:
             table.add_row(stat.name, str(stat.fail_count), str(stat.total_runs))
@@ -278,6 +270,7 @@ def _print_rich(report: FlakeReport, verbose: bool) -> None:
 # Private helper: plain text output (no rich library)
 # =============================================================================
 
+
 def _print_plain(report: FlakeReport, verbose: bool) -> None:
     """Render a plain-text version of the report (no rich library needed)."""
     print()
@@ -309,11 +302,15 @@ def _print_plain(report: FlakeReport, verbose: bool) -> None:
         print("ALWAYS-FAILING TESTS (broken):")
         print("-" * 40)
         for stat in report.always_failing_tests:
-            print(f"  [BROKEN] {stat.name}  (failed {stat.fail_count}/{stat.total_runs} runs)")
+            print(
+                f"  [BROKEN] {stat.name}  (failed {stat.fail_count}/{stat.total_runs} runs)"
+            )
         print()
 
     stable_count = len(report.stable_tests)
-    print(f"✅  Stable: {stable_count}/{report.total_tests} tests consistently passing.")
+    print(
+        f"✅  Stable: {stable_count}/{report.total_tests} tests consistently passing."
+    )
     print()
 
     if report.flaky_tests or report.always_failing_tests:
@@ -332,6 +329,7 @@ def _print_plain(report: FlakeReport, verbose: bool) -> None:
 # Private helper: convert FlakeReport to a plain dict for JSON serialization
 # =============================================================================
 
+
 def _report_to_dict(report: FlakeReport) -> dict:
     """
     Convert a FlakeReport dataclass to a plain Python dictionary.
@@ -346,42 +344,40 @@ def _report_to_dict(report: FlakeReport) -> dict:
     Returns:
         A nested dict suitable for passing to `json.dump()`.
     """
+
     # Helper to convert a single FlakeStats to a dict.
     def stats_to_dict(s: FlakeStats) -> dict:
         return {
-            "name":              s.name,
-            "total_runs":        s.total_runs,
-            "pass_count":        s.pass_count,
-            "fail_count":        s.fail_count,
-            "skip_count":        s.skip_count,
-            "flake_rate":        s.flake_rate,
-            "flake_percentage":  s.flake_percentage,
-            "is_flaky":          s.is_flaky,
+            "name": s.name,
+            "total_runs": s.total_runs,
+            "pass_count": s.pass_count,
+            "fail_count": s.fail_count,
+            "skip_count": s.skip_count,
+            "flake_rate": s.flake_rate,
+            "flake_percentage": s.flake_percentage,
+            "is_flaky": s.is_flaky,
             "is_always_failing": s.is_always_failing,
             "is_always_passing": s.is_always_passing,
-            "messages":          s.messages,
+            "messages": s.messages,
         }
 
     # Build the top-level report dict.
     return {
         "meta": {
-            "command":       report.command,
-            "total_runs":    report.total_runs,
-            "generated_at":  report.generated_at.isoformat(),
-            "tool_version":  report.tool_version,
+            "command": report.command,
+            "total_runs": report.total_runs,
+            "generated_at": report.generated_at.isoformat(),
+            "tool_version": report.tool_version,
         },
         "summary": {
-            "total_tests":        report.total_tests,
-            "flaky_count":        len(report.flaky_tests),
+            "total_tests": report.total_tests,
+            "flaky_count": len(report.flaky_tests),
             "always_failing_count": len(report.always_failing_tests),
-            "stable_count":       len(report.stable_tests),
-            "has_issues":         bool(report.flaky_tests or report.always_failing_tests),
+            "stable_count": len(report.stable_tests),
+            "has_issues": bool(report.flaky_tests or report.always_failing_tests),
         },
         # All test stats, keyed by test name for easy lookup.
-        "tests": {
-            name: stats_to_dict(stat)
-            for name, stat in report.stats.items()
-        },
+        "tests": {name: stats_to_dict(stat) for name, stat in report.stats.items()},
         # Flaky tests sorted by flake rate, for quick scanning.
         "flaky_tests": [stats_to_dict(s) for s in report.flaky_tests],
         # Always-failing tests.

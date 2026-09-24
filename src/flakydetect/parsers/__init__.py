@@ -90,8 +90,8 @@ def get_parser(
         # Auto-detect: use JUnit XML if we have a populated file, else stdout.
         xml_available = (
             xml_path is not None
-            and os.path.isfile(xml_path)          # File exists on disk
-            and os.path.getsize(xml_path) > 0     # File is not empty
+            and os.path.isfile(xml_path)  # File exists on disk
+            and os.path.getsize(xml_path) > 0  # File is not empty
         )
 
         if xml_available:

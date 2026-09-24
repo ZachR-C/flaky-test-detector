@@ -45,19 +45,19 @@
 
 # Standard library
 import logging
-import sys
 from pathlib import Path
 from typing import Optional
 
 # Third-party
-import typer    # Modern CLI builder (install: pip install typer)
+import typer  # Modern CLI builder (install: pip install typer)
 from typing_extensions import Annotated  # For adding descriptions to CLI args
+
+from . import __version__
+from .aggregator import Aggregator
+from .report import print_report, save_json
 
 # Local package imports
 from .runner import TestRunner
-from .aggregator import Aggregator
-from .report import print_report, save_json
-from . import __version__
 
 # =============================================================================
 # typer App
@@ -111,7 +111,8 @@ def main(
     cmd: Annotated[
         str,
         typer.Option(
-            "--cmd", "-c",
+            "--cmd",
+            "-c",
             help="The test command to run. Example: [dim]pytest tests/[/dim]",
             prompt="Test command to run",
             prompt_required=False,
@@ -125,10 +126,11 @@ def main(
     runs: Annotated[
         int,
         typer.Option(
-            "--runs", "-n",
+            "--runs",
+            "-n",
             help="Number of times to run the test suite. More runs = higher confidence.",
-            min=1,    # typer validates this automatically — must be >= 1
-            max=1000, # Cap at 1000 to prevent accidents
+            min=1,  # typer validates this automatically — must be >= 1
+            max=1000,  # Cap at 1000 to prevent accidents
         ),
     ] = 10,
     # -------------------------------------------------------------------------
@@ -138,7 +140,8 @@ def main(
     output: Annotated[
         Optional[Path],
         typer.Option(
-            "--output", "-o",
+            "--output",
+            "-o",
             help="Save the report as JSON to this path. Example: [dim]report.json[/dim]",
         ),
     ] = None,
@@ -150,7 +153,8 @@ def main(
     threshold: Annotated[
         float,
         typer.Option(
-            "--threshold", "-t",
+            "--threshold",
+            "-t",
             help=(
                 "Minimum flake rate %% to flag a test. Tests below this "
                 "threshold won't be reported as flaky. Default: 5.0"
@@ -166,7 +170,8 @@ def main(
     working_dir: Annotated[
         Optional[Path],
         typer.Option(
-            "--dir", "-d",
+            "--dir",
+            "-d",
             help="Working directory for the test command. Defaults to current directory.",
         ),
     ] = None,
@@ -199,7 +204,9 @@ def main(
     # -------------------------------------------------------------------------
     verbose: Annotated[
         bool,
-        typer.Option("--verbose", "-v", help="Show detailed output including failure messages."),
+        typer.Option(
+            "--verbose", "-v", help="Show detailed output including failure messages."
+        ),
     ] = False,
     # -------------------------------------------------------------------------
     # --quiet / -q
@@ -207,7 +214,9 @@ def main(
     # -------------------------------------------------------------------------
     quiet: Annotated[
         bool,
-        typer.Option("--quiet", "-q", help="Suppress all output except the final verdict."),
+        typer.Option(
+            "--quiet", "-q", help="Suppress all output except the final verdict."
+        ),
     ] = False,
     # -------------------------------------------------------------------------
     # --version
@@ -273,7 +282,9 @@ def main(
         raise typer.Exit(code=1)
 
     if working_dir and not working_dir.is_dir():
-        typer.echo(f"❌  Error: --dir {working_dir} is not a valid directory.", err=True)
+        typer.echo(
+            f"❌  Error: --dir {working_dir} is not a valid directory.", err=True
+        )
         raise typer.Exit(code=1)
 
     # Convert threshold from percentage (0–100) to fraction (0.0–1.0)

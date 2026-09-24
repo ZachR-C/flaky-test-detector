@@ -38,7 +38,7 @@
 # =============================================================================
 
 import logging
-import xml.etree.ElementTree as ET   # Standard library XML parser
+import xml.etree.ElementTree as ET  # Standard library XML parser
 from typing import List, Optional
 
 from ..models import TestResult
@@ -94,8 +94,7 @@ class JUnitXMLParser(BaseParser):
 
         except FileNotFoundError:
             logger.warning(
-                "JUnit XML file not found at %s. "
-                "Did pytest write it successfully?",
+                "JUnit XML file not found at %s. " "Did pytest write it successfully?",
                 self.xml_path,
             )
             return []
@@ -135,9 +134,7 @@ class JUnitXMLParser(BaseParser):
                 logger.debug("Error parsing testcase element: %s", e, exc_info=True)
                 continue
 
-        logger.debug(
-            "Parsed %d test results from %s", len(results), self.xml_path
-        )
+        logger.debug("Parsed %d test results from %s", len(results), self.xml_path)
         return results
 
     def _parse_testcase(self, elem: ET.Element) -> Optional[TestResult]:
